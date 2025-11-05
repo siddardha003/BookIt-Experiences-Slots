@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "../../components/ui/button";
 import { useExperienceDetail } from "../../hooks/useExperiences";
 import { Schedule } from "../../services/experiencesService";
+import { Input } from "../../components/ui/input";
 
 export const ExperienceDetail = (): JSX.Element => {
   const navigate = useNavigate();
@@ -84,29 +85,25 @@ export const ExperienceDetail = (): JSX.Element => {
 
   return (
     <div className="bg-[#f8f8f8] min-h-screen">
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center">
-                <span className="text-white text-xs font-bold">H</span>
-              </div>
-              <span className="text-black font-semibold">highway</span>
-              <span className="text-gray-500 text-sm">delhi</span>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <input
-              type="text"
-              placeholder="Search"
-              className="px-4 py-2 border border-gray-300 rounded-lg w-64"
-            />
-            <Button className="bg-[#FFD700] hover:bg-[#FFC700] text-black font-medium">
-              Search
-            </Button>
-          </div>
-        </div>
+      <header className="flex w-full items-center justify-between px-[124px] py-4 bg-[#f8f8f8] shadow-[0px_2px_16px_#0000001a]">
+      <img
+        className="w-[100px] h-[55px] object-cover"
+        alt="Hdlogo"
+        src="/hdlogo-1.png"
+      />
+
+      <div className="inline-flex items-center gap-4">
+        <Input
+          type="text"
+          placeholder="Search experiences"
+          className="w-[340px] h-[42px] bg-[#ececec] border-0 text-sm text-[#727272] placeholder:text-[#727272] focus-visible:ring-0 focus-visible:ring-offset-0"
+        />
+
+        <Button className="h-auto bg-[#ffd643] hover:bg-[#ffd643]/90 text-[#161616] font-medium text-sm px-5 py-3 rounded-lg">
+          Search
+        </Button>
       </div>
+    </header>
 
       <div className="max-w-7xl mx-auto px-4 py-6">
         <button
@@ -131,28 +128,25 @@ export const ExperienceDetail = (): JSX.Element => {
           Details
         </button>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-8">
             <div className="relative">
               <img
                 src={experience.image_url || "/frame-9.png"}
                 alt={experience.name}
-                className="w-full h-96 object-cover rounded-lg"
+                className="w-full h-96 object-cover rounded-xl"
               />
-              <div className="absolute bottom-4 left-4 bg-[#FFD700] px-3 py-1 text-sm font-semibold">
-                {experience.location}
-              </div>
             </div>
 
             <div>
-              <h1 className="text-3xl font-bold mb-4">{experience.name}</h1>
+              <h1 className="text-3xl font-medium mb-4">{experience.name}</h1>
               <p className="text-gray-600">
                 {experience.description || experience.short_description}
               </p>
             </div>
 
             <div>
-              <h2 className="text-xl font-bold mb-4">Choose date</h2>
+              <h2 className="text-xl font-medium mb-4">Choose date</h2>
               <div className="flex gap-2 flex-wrap">
                 {Object.entries(schedulesByDate).map(([date, schedules]) => (
                   <button
@@ -171,7 +165,7 @@ export const ExperienceDetail = (): JSX.Element => {
             </div>
 
             <div>
-              <h2 className="text-xl font-bold mb-4">Choose time</h2>
+              <h2 className="text-xl font-medium mb-4">Choose time</h2>
               <div className="flex gap-2 flex-wrap">
                 {selectedSchedule && 
                   schedulesByDate[
@@ -211,8 +205,8 @@ export const ExperienceDetail = (): JSX.Element => {
             </div>
 
             <div>
-              <h2 className="text-xl font-bold mb-4">About</h2>
-              <p className="text-gray-600 bg-white p-4 rounded-lg">
+              <h2 className="text-xl font-medium mb-4">About</h2>
+              <p className="text-gray-600 bg-[#ececec] p-4 rounded-lg">
                 {experience.description || "Scenic routes, trained guides, and safety briefing."}
                 {experience.min_age && ` Minimum age ${experience.min_age}.`}
               </p>
@@ -220,11 +214,11 @@ export const ExperienceDetail = (): JSX.Element => {
           </div>
 
           <div className="lg:col-span-1">
-            <div className="bg-white p-6 rounded-lg shadow-sm sticky top-6">
+            <div className="bg-[#ececec] p-6 rounded-lg shadow-sm sticky top-6">
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Starts at</span>
-                  <span className="text-lg font-bold">₹{basePrice}</span>
+                  <span className="text-lg font-medium">₹{basePrice}</span>
                 </div>
 
                 <div className="flex justify-between items-center">
@@ -256,15 +250,15 @@ export const ExperienceDetail = (): JSX.Element => {
                   <span className="font-medium">₹{taxes}</span>
                 </div>
 
-                <div className="pt-4 border-t border-gray-200">
+                <div className="pt-4 border-t border-gray-300">
                   <div className="flex justify-between items-center mb-4">
-                    <span className="text-lg font-bold">Total</span>
-                    <span className="text-lg font-bold">₹{total}</span>
+                    <span className="text-lg font-medium">Total</span>
+                    <span className="text-lg font-medium">₹{total}</span>
                   </div>
                   <Button 
                     onClick={handleConfirm}
                     disabled={!selectedSchedule || selectedSchedule.slots_available === 0}
-                    className="w-full bg-[#FFD700] hover:bg-[#FFC700] text-black font-semibold py-6 text-lg disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                    className="w-full bg-[#FFD700] hover:bg-[#FFC700] text-gray-800 font-medium py-6 text-lg disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed rounded-xl"
                   >
                     {!selectedSchedule 
                       ? "Select Date & Time" 

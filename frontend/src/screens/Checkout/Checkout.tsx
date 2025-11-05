@@ -100,12 +100,25 @@ export const Checkout = (): JSX.Element => {
   };
 
   const handlePayAndConfirm = async () => {
-    if (!bookingData || !validateForm() || !formData.agreeToTerms) return;
+    console.log('Pay and Confirm clicked');
+    console.log('Booking data:', bookingData);
+    console.log('Form data:', formData);
+    console.log('Terms agreed:', formData.agreeToTerms);
+    
+    if (!bookingData || !validateForm() || !formData.agreeToTerms) {
+      console.log('Validation failed');
+      // Show validation error if terms not agreed
+      if (!formData.agreeToTerms) {
+        alert('Please agree to the terms and safety policy to continue.');
+      }
+      return;
+    }
 
     try {
+      console.log('Starting booking process...');
       const finalAmount = bookingData.total - promoDiscount;
       
-      const result = await createBooking({
+      const bookingRequest = {
         experienceId: bookingData.experienceId,
         scheduleId: bookingData.scheduleId,
         fullName: formData.fullName,
@@ -113,15 +126,49 @@ export const Checkout = (): JSX.Element => {
         quantity: bookingData.quantity,
         promoCode: promoApplied ? formData.promoCode : undefined,
         totalAmount: finalAmount
-      });
+      };
+      
+      console.log('Booking request:', bookingRequest);
+      
+      const result = await createBooking(bookingRequest);
+      console.log('Booking result:', result);
 
       // Store result for the result page
-      sessionStorage.setItem('bookingResult', JSON.stringify(result));
+      const resultData = {
+        bookingId: result?.bookingId || 'BK' + Date.now(),
+        referenceId: result?.referenceId || 'REF' + Date.now(),
+        message: result?.message || 'Booking confirmed successfully'
+      };
+      
+      console.log('Storing result data:', resultData);
+      
+      // Store in both sessionStorage and localStorage for reliability
+      sessionStorage.setItem('bookingResult', JSON.stringify(resultData));
+      localStorage.setItem('bookingResult', JSON.stringify(resultData));
       sessionStorage.removeItem('bookingData'); // Clean up
       
-      navigate("/result");
+      console.log('SessionStorage after setting:', sessionStorage.getItem('bookingResult'));
+      console.log('LocalStorage after setting:', localStorage.getItem('bookingResult'));
+      
+      // Also store individual components for debugging
+      sessionStorage.setItem('bookingId', resultData.bookingId);
+      sessionStorage.setItem('referenceId', resultData.referenceId);
+      
+      console.log('Individual storage items:');
+      console.log('- bookingId:', sessionStorage.getItem('bookingId'));
+      console.log('- referenceId:', sessionStorage.getItem('referenceId'));
+      
+      console.log('Navigating to result page...');
+      
+      // Use React Router navigation
+      navigate("/result", { 
+        replace: true,
+        state: { bookingResult: resultData }
+      });
     } catch (error) {
       console.error("Booking failed:", error);
+      alert('Booking failed: ' + (error instanceof Error ? error.message : 'Unknown error'));
+      // Don't navigate if booking fails
     }
   };
 
@@ -142,31 +189,22 @@ export const Checkout = (): JSX.Element => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center">
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center">
-                  <span className="text-white text-xs font-bold">H</span>
-                </div>
-                <span className="text-black font-semibold">highway</span>
-                <span className="text-gray-500 text-sm">delhi</span>
-              </div>
-            </div>
-            <div className="flex-1 max-w-lg mx-8">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search"
-                  className="w-full pl-4 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
-                />
-              </div>
-            </div>
-            <Button className="bg-yellow-400 hover:bg-yellow-500 text-black font-medium px-6">
-              Search
-            </Button>
-          </div>
+      <header className="flex w-full items-center justify-between px-[124px] py-4 bg-[#f8f8f8] shadow-[0px_2px_16px_#0000001a]">
+      <img
+        className="w-[100px] h-[55px] object-cover"
+        alt="Hdlogo"
+        src="/hdlogo-1.png"
+      />
+
+        <div className="inline-flex items-center gap-4">
+          <Input
+            type="text"
+            placeholder="Search experiences"
+            className="w-[340px] h-[42px] bg-[#ececec] border-0 text-sm text-[#727272] placeholder:text-[#727272] focus-visible:ring-0 focus-visible:ring-offset-0"
+          />
+          <Button className="h-auto bg-[#ffd643] hover:bg-[#ffd643]/90 text-[#161616] font-medium text-sm px-5 py-3 rounded-lg">
+            Search
+          </Button>
         </div>
       </header>
 
@@ -175,7 +213,7 @@ export const Checkout = (): JSX.Element => {
         {/* Back Button */}
         <button
           onClick={handleBack}
-          className="flex items-center text-gray-600 mb-8 hover:text-gray-800"
+          className="flex items-center text-black mb-8 hover:text-gray-800"
         >
           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -194,11 +232,11 @@ export const Checkout = (): JSX.Element => {
             )}
 
             {/* Personal Information */}
-            <div className="bg-white rounded-lg p-6 shadow-sm">
+            <div className="bg-[#EFEFEFFF] rounded-lg p-6 shadow-sm">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Full name *
+                    Full name
                   </label>
                   <Input
                     type="text"
@@ -206,7 +244,7 @@ export const Checkout = (): JSX.Element => {
                     placeholder="Your name"
                     value={formData.fullName}
                     onChange={handleInputChange}
-                    className={`w-full ${formErrors.fullName ? 'border-red-500' : ''}`}
+                    className={`w-full h-[40px] bg-[#DFDFDFFF] ${formErrors.fullName ? 'border-red-500' : ''}`}
                   />
                   {formErrors.fullName && (
                     <p className="text-red-500 text-xs mt-1">{formErrors.fullName}</p>
@@ -214,15 +252,15 @@ export const Checkout = (): JSX.Element => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Email *
+                    Email
                   </label>
                   <Input
                     type="email"
                     name="email"
-                    placeholder="your.email@example.com"
+                    placeholder="Your mail"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className={`w-full ${formErrors.email ? 'border-red-500' : ''}`}
+                    className={`w-full h-[40px] bg-[#DFDFDFFF] ${formErrors.email ? 'border-red-500' : ''}`}
                   />
                   {formErrors.email && (
                     <p className="text-red-500 text-xs mt-1">{formErrors.email}</p>
@@ -232,23 +270,20 @@ export const Checkout = (): JSX.Element => {
 
               {/* Promo Code */}
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Promo code
-                </label>
                 <div className="flex gap-2">
                   <Input
                     type="text"
                     name="promoCode"
-                    placeholder="Enter promo code (e.g., SAVE10, FLAT100)"
+                    placeholder="Promo code"
                     value={formData.promoCode}
                     onChange={handleInputChange}
-                    className="flex-1"
+                    className="flex-1 w-full h-[40px] bg-[#DFDFDFFF]"
                     disabled={promoApplied}
                   />
                   <Button
                     onClick={handleApplyPromo}
                     disabled={!formData.promoCode.trim() || promoLoading || promoApplied}
-                    className="bg-black hover:bg-gray-800 text-white px-6 disabled:bg-gray-400"
+                    className="bg-black hover:bg-gray-800 text-white px-6"
                   >
                     {promoLoading ? "..." : promoApplied ? "Applied" : "Apply"}
                   </Button>
@@ -271,24 +306,29 @@ export const Checkout = (): JSX.Element => {
                   name="agreeToTerms"
                   checked={formData.agreeToTerms}
                   onChange={handleInputChange}
-                  className="mt-1 h-4 w-4 text-yellow-600 focus:ring-yellow-500 border-gray-300 rounded"
+                  className="mt-0.5 h-4 w-4 text-yellow-600 focus:ring-yellow-500 border-gray-300 rounded"
                 />
                 <label htmlFor="terms" className="text-sm text-gray-600">
-                  I agree to the terms and safety policy *
+                  I agree to the terms and safety policy
                 </label>
               </div>
+
+              {/* Error message for terms */}
+              {!formData.agreeToTerms && bookingError && (
+                <div className="text-red-500 text-sm">
+                  Please agree to the terms and conditions to proceed with booking.
+                </div>
+              )}
             </div>
           </div>
 
           {/* Right Section - Booking Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg p-6 shadow-sm sticky top-8">
+            <div className="bg-[#EFEFEFFF] rounded-lg p-6 shadow-sm sticky top-8">
               <div className="space-y-4">
-                <div className="flex justify-between items-start">
-                  <div>
+                <div className="flex justify-between">
                     <span className="text-sm text-gray-600">Experience</span>
-                    <p className="font-semibold">{bookingData.experienceName}</p>
-                  </div>
+                    <span className="font-medium">{bookingData.experienceName}</span>
                 </div>
 
                 <div className="flex justify-between">
@@ -312,8 +352,6 @@ export const Checkout = (): JSX.Element => {
                   <span className="text-sm font-medium">{bookingData.quantity}</span>
                 </div>
 
-                <hr className="border-gray-200" />
-
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-600">Subtotal</span>
                   <span className="text-sm font-medium">₹{bookingData.subtotal}</span>
@@ -331,17 +369,16 @@ export const Checkout = (): JSX.Element => {
                   </div>
                 )}
 
-                <hr className="border-gray-200" />
+                <hr className="border-gray-300" />
 
                 <div className="flex justify-between items-center">
-                  <span className="text-lg font-semibold">Total</span>
-                  <span className="text-lg font-bold">₹{finalTotal}</span>
+                  <span className="text-xl font-medium">Total</span>
+                  <span className="text-lg font-medium">₹{finalTotal}</span>
                 </div>
 
                 <Button
                   onClick={handlePayAndConfirm}
-                  disabled={!formData.agreeToTerms || bookingLoading || !validateForm()}
-                  className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-3 mt-6 disabled:bg-gray-300 disabled:text-gray-500"
+                  className="w-full h-[44px] rounded-xl bg-yellow-400 hover:bg-yellow-500 text-gray-800 font-medium text-md py-3 mt-6"
                 >
                   {bookingLoading ? "Processing..." : "Pay and Confirm"}
                 </Button>

@@ -17,9 +17,9 @@ export const ExperienceCardDynamic = ({ experience }: ExperienceCardDynamicProps
 
     return (
         <Card className="flex flex-col w-full rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow bg-white">
-            {/* Experience Image - Clean with no overlays */}
+            {/* Experience Image */}
             <div 
-                className="w-full h-[180px] bg-cover bg-center bg-gray-200 relative"
+                className="w-full h-[200px] bg-cover bg-center bg-gray-200 relative"
                 style={{ 
                     backgroundImage: experience.image_url ? `url(${experience.image_url})` : 'none' 
                 }}
@@ -29,33 +29,33 @@ export const ExperienceCardDynamic = ({ experience }: ExperienceCardDynamicProps
                 )}
             </div>
 
-            {/* Card Content - ALL content below image */}
-            <CardContent className="flex flex-col p-4 bg-white">
+            {/* Card Content */}
+            <CardContent className="flex flex-col p-4 bg-gray-100">
                 {/* Experience Title and Location Badge */}
-                <div className="flex items-start justify-between mb-2">
-                    <h3 className="font-semibold text-gray-900 text-base leading-tight flex-1">
+                <div className="flex items-start justify-between mb-3">
+                    <h3 className="font-medium text-gray-800 text-base leading-tight flex-1 text-lg">
                         {experience.name}
                     </h3>
-                    <Badge className="ml-2 px-2 py-1 bg-gray-200 text-gray-700 text-xs font-medium rounded border-0">
+                    <Badge className="ml-2 px-2 py-1 bg-gray-200 text-gray-600 text-xs font-medium rounded-md border-0">
                         {experience.location}
                     </Badge>
                 </div>
 
                 {/* Description */}
-                <p className="text-gray-500 text-sm leading-relaxed mb-4">
+                <p className="text-gray-400 text-sm leading-relaxed mb-4">
                     Curated small-group experience. Certified guide. Safety first with gear included.
                 </p>
 
                 {/* Price and Button Row */}
                 <div className="flex items-center justify-between">
-                    <div className="flex items-baseline gap-1">
-                        <span className="text-gray-500 text-sm">From</span>
-                        <span className="font-bold text-black text-lg">₹{experience.price}</span>
+                    <div className="flex items-baseline gap-2">
+                        <span className="text-gray-800 text-sm">From</span>
+                        <span className="font-medium text-gray-800 text-xl">₹{experience.price}</span>
                     </div>
 
                     <Button
                         onClick={handleViewDetails}
-                        className="bg-yellow-400 hover:bg-yellow-500 text-black font-semibold px-4 py-2 rounded text-sm transition-colors border-0"
+                        className="bg-yellow-400 hover:bg-yellow-500 text-gray-800 font-medium px-4 py-2 rounded-lg text-sm transition-colors border-0"
                     >
                         View Details
                     </Button>

@@ -30,11 +30,25 @@ export interface APIResponse<T> {
   error?: string;
 }
 
+export interface SearchParams {
+  search?: string;
+  category?: string;
+  location?: string;
+}
+
 export const experiencesService = {
-  // GET /experiences - Get all experiences
-  getAll: async (): Promise<Experience[]> => {
+  // GET /experiences - Get all experiences with optional search parameters
+  getAll: async (searchParams?: SearchParams): Promise<Experience[]> => {
     try {
-      const response = await api.get<APIResponse<Experience[]>>('/experiences');
+      const params = new URLSearchParams();
+      if (searchParams?.search) params.append('search', searchParams.search);
+      if (searchParams?.category) params.append('category', searchParams.category);
+      if (searchParams?.location) params.append('location', searchParams.location);
+      
+      const queryString = params.toString();
+      const url = queryString ? `/experiences?${queryString}` : '/experiences';
+      
+      const response = await api.get<APIResponse<Experience[]>>(url);
       if (response.data.success) {
         return response.data.data;
       }
